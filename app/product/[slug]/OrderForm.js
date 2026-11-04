@@ -23,7 +23,7 @@ export default function OrderForm({ product }) {
     });
     const j = await res.json().catch(() => ({}));
     setBusy(false);
-    if (!res.ok) return setError(j.error || 'We couldn't place your order. Check your connection and try again.');
+        if (!res.ok) return setError(j.error || "We couldn't place your order. Check your connection and try again.");
     setDone(j.orderNumber);
   }
 
