@@ -98,7 +98,7 @@ export default function NewProductPage() {
       <div style={{ maxWidth: 360, margin: "80px auto", padding: 28, background: "#fff", border: "1px solid #e2e2dd", borderRadius: 8, fontFamily: "system-ui, sans-serif" }}>
         <h1 style={{ margin: "0 0 8px", fontSize: 18 }}>Admin sign in</h1>
         <p style={{ margin: "0 0 16px", color: "#666", fontSize: 13 }}>Enter the ADMIN_TOKEN you set in Vercel env vars.</p>
-        <form onSubmit={(e) => { e.preventDefault(); setToken(tokenInput.trim()); setTokenState(tokenInput.trim()); loadForm(tokenInput.trim()); }}>
+        <form onSubmit={(e) => { e.preventDefault(); setTokenState(tokenInput.trim()); loadForm(tokenInput.trim()); }}>
           <div style={{ marginBottom: 14 }}>
             <input type="password" placeholder="ADMIN_TOKEN" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} autoFocus style={{ width: "100%", padding: "8px 10px", border: "1px solid #d4d4cf", borderRadius: 5, fontSize: 14, boxSizing: "border-box" }} />
           </div>
