@@ -1,5 +1,13 @@
 "use client";
 
+// Publish a product: pick a CeePrinto design + blank + variations,
+// fill in name/price/slug, click Publish. One click:
+//   - creates CeePrinto listings (one per variation)
+//   - fetches the mockup image
+//   - inserts the Supabase products row (active=true)
+//
+// Auth: reads ADMIN_TOKEN from localStorage.
+
 import { useState, useEffect } from "react";
 
 function getToken() {
@@ -31,49 +39,74 @@ export default function NewProductPage() {
 
   useEffect(() => {
     const t = getToken();
-    if (t) { setTokenState(t); loadForm(t); } else { setLoading(false); }
+    if (t) {
+      setTokenState(t);
+      loadForm(t);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   async function loadForm(t) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/admin/products", { headers: { Authorization: `Bearer ${t}` } });
+      const res = await fetch("/api/admin/products", {
+        headers: { Authorization: `Bearer ${t}` },
+      });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error || `HTTP ${res.status}`);
       setDesigns(j.designs || []);
       setBlanks(j.blanks || []);
-    } catch (e) { setError(e.message); } finally { setLoading(false); }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function onBlankChange(id) {
     setBlankId(id);
-    setVariations([]); setPickedVars({}); setSizeLabels({});
+    setVariations([]);
+    setPickedVars({});
+    setSizeLabels({});
     if (!id) return;
     try {
-      const res = await fetch(`/api/admin/products?blank_id=${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`/api/admin/products?blank_id=${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error || `HTTP ${res.status}`);
       setVariations(j.blank?.variations || []);
-      const picked = {}; const labels = {};
+      const picked = {};
+      const labels = {};
       (j.blank?.variations || []).forEach((v) => {
         picked[v.variation_id] = true;
         labels[v.variation_id] = v.size || v.label?.split(" / ").pop() || "M";
       });
-      setPickedVars(picked); setSizeLabels(labels);
-    } catch (e) { setError(e.message); }
+      setPickedVars(picked);
+      setSizeLabels(labels);
+    } catch (e) {
+      setError(e.message);
+    }
   }
 
   function onNameChange(v) {
     setName(v);
-    if (!slug) setSlug(v.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""));
+    if (!slug) {
+      setSlug(v.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""));
+    }
   }
 
   async function submit(e) {
     e.preventDefault();
-    setError(""); setResult(null);
+    setError("");
+    setResult(null);
     const chosen = variations.filter((v) => pickedVars[v.variation_id]);
-    if (chosen.length === 0) { setError("Pick at least one variation (size/color)."); return; }
+    if (chosen.length === 0) {
+      setError("Pick at least one variation (size/color).");
+      return;
+    }
     const sizes = chosen.map((v) => sizeLabels[v.variation_id] || "M");
     setSubmitting(true);
     try {
@@ -84,21 +117,30 @@ export default function NewProductPage() {
           design_id: Number(designId),
           blank_product_id: Number(blankId),
           variations: chosen.map((v) => ({ variation_id: v.variation_id, label: v.label })),
-          name, slug, price_pkr: Number(price), description, sizes,
+          name,
+          slug,
+          price_pkr: Number(price),
+          description,
+          sizes,
         }),
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error || `HTTP ${res.status}`);
       setResult(j);
-    } catch (e) { setError(e.message); } finally { setSubmitting(false); }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
+  // --- Login gate ---
   if (!token) {
     return (
       <div style={{ maxWidth: 360, margin: "80px auto", padding: 28, background: "#fff", border: "1px solid #e2e2dd", borderRadius: 8, fontFamily: "system-ui, sans-serif" }}>
         <h1 style={{ margin: "0 0 8px", fontSize: 18 }}>Admin sign in</h1>
         <p style={{ margin: "0 0 16px", color: "#666", fontSize: 13 }}>Enter the ADMIN_TOKEN you set in Vercel env vars.</p>
-        <form onSubmit={(e) => { e.preventDefault(); setToken(tokenInput.trim()); setTokenState(tokenInput.trim()); loadForm(tokenInput.trim()); }}>
+        <form onSubmit={(e) => { e.preventDefault(); setTokenState(tokenInput.trim()); loadForm(tokenInput.trim()); }}>
           <div style={{ marginBottom: 14 }}>
             <input type="password" placeholder="ADMIN_TOKEN" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} autoFocus style={{ width: "100%", padding: "8px 10px", border: "1px solid #d4d4cf", borderRadius: 5, fontSize: 14, boxSizing: "border-box" }} />
           </div>
@@ -118,7 +160,8 @@ export default function NewProductPage() {
     <div style={{ maxWidth: 880, margin: "0 auto", padding: "32px 24px", fontFamily: "system-ui, sans-serif" }}>
       <h1 style={{ fontSize: 22, margin: "0 0 4px" }}>Publish a product</h1>
       <p style={{ color: "#777", margin: "0 0 20px", fontSize: 13 }}>
-        Pick a design you already uploaded to CeePrinto, choose a blank and the sizes you want to sell, set your price, and click Publish.
+        Pick a design you already uploaded to CeePrinto, choose a blank and the sizes you want to sell,
+        set your price, and click Publish.
       </p>
 
       {error && <div style={{ background: "#fbe9e7", border: "1px solid #ffab91", color: "#b71c1c", padding: "12px 16px", borderRadius: 6, marginBottom: 16, wordBreak: "break-word" }}>{error}</div>}
@@ -132,6 +175,7 @@ export default function NewProductPage() {
       )}
 
       <form onSubmit={submit}>
+        {/* Step 1: pick design */}
         <div style={cardStyle}>
           <h2 style={{ margin: "0 0 4px", fontSize: 16 }}>1 · CeePrinto design</h2>
           <p style={{ color: "#777", fontSize: 12, margin: "0 0 16px" }}>
@@ -141,7 +185,9 @@ export default function NewProductPage() {
             <label style={labelStyle}>Design</label>
             <select value={designId} onChange={(e) => setDesignId(e.target.value)} required style={inputStyle}>
               <option value="">— pick a design —</option>
-              {designs.map((d) => (<option key={d.id} value={d.id}>{d.name} (#{d.id})</option>))}
+              {designs.map((d) => (
+                <option key={d.id} value={d.id}>{d.name} (#{d.id})</option>
+              ))}
             </select>
           </div>
           {designs.length === 0 && (
@@ -149,6 +195,7 @@ export default function NewProductPage() {
           )}
         </div>
 
+        {/* Step 2: pick blank + variations */}
         <div style={cardStyle}>
           <h2 style={{ margin: "0 0 4px", fontSize: 16 }}>2 · Blank product &amp; sizes</h2>
           <p style={{ color: "#777", fontSize: 12, margin: "0 0 16px" }}>The garment CeePrinto will print on. Variations are the sizes/colors you can offer.</p>
@@ -177,6 +224,7 @@ export default function NewProductPage() {
           )}
         </div>
 
+        {/* Step 3: storefront details */}
         <div style={cardStyle}>
           <h2 style={{ margin: "0 0 4px", fontSize: 16 }}>3 · Storefront details</h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
