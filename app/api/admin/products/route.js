@@ -166,11 +166,14 @@ export async function POST(req) {
   }
 
   // 3. Fetch mockup (best-effort, non-fatal).
-  let imageUrl = null;
-  try {
-    imageUrl = pickMockupImageUrl(await getDesignMockups(designId));
-  } catch (e) {
-    console.error("[admin/products] mockup fetch failed (non-fatal):", e.message);
+let imageUrl = null;
+try {
+  const mockupsResponse = await getDesignMockups(designId);
+  console.log("[admin/products] mockups response:", JSON.stringify(mockupsResponse).slice(0, 800));
+  imageUrl = pickMockupImageUrl(mockupsResponse);
+  console.log("[admin/products] picked image_url:", imageUrl);
+} catch (e) {
+  console.error("[admin/products] mockup fetch failed (non-fatal):", e.message);
   }
 
   // 4. Build size -> external_variant_id map (for order forwarding later).

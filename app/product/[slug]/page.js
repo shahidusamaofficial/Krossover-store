@@ -3,6 +3,8 @@ import { getProduct, rs } from '../../../lib/data';
 import Garment from '../../../components/Garment';
 import OrderForm from './OrderForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Product({ params }) {
   const p = await getProduct(params.slug);
   if (!p) notFound();
