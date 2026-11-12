@@ -19,7 +19,12 @@ export default async function Product({ params }) {
   return (
     <div className="pd">
             <div className="pd-media">
-        <div style={{ color: 'red', padding: 20 }}>DEBUG: page.js v2 running</div>
+                <div style={{ color: 'red', padding: 20, fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>
+          DEBUG video_url = {JSON.stringify(p.video_url)}<br/>
+          DEBUG images = {JSON.stringify(p.images)}<br/>
+          DEBUG image_url = {JSON.stringify(p.image_url)}<br/>
+          DEBUG all keys = {Object.keys(p).join(', ')}
+        </div>
         <Gallery images={images} alt={p.name} garmentKind={garmentKind} />
 
         {p.video_url && (
