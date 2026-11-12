@@ -18,7 +18,8 @@ export default async function Product({ params }) {
 
   return (
     <div className="pd">
-      <div className="pd-media">
+            <div className="pd-media">
+        <div style={{ color: 'red', padding: 20 }}>DEBUG: page.js v2 running</div>
         <Gallery images={images} alt={p.name} garmentKind={garmentKind} />
 
         {p.video_url && (
