@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { getProduct, rs } from '../../../lib/data';
-import Garment from '../../../components/Garment';
 import Gallery from './Gallery';
 import OrderForm from './OrderForm';
 
@@ -20,7 +19,7 @@ export default async function Product({ params }) {
   return (
     <div className="pd">
       <div className="pd-media">
-        <Gallery images={images} alt={p.name} garmentKind={garmentKind} Garment={Garment} />
+        <Gallery images={images} alt={p.name} garmentKind={garmentKind} />
 
         {p.video_url && (
           <div className="video">

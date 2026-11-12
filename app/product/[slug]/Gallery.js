@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import Garment from '../../../components/Garment';
 
 /**
  * Client-side image gallery for the product detail page.
  * Shows the main image + a row of clickable thumbnails.
- * Kept minimal: no lightbox, no zoom — just swap the main image.
+ * Garment is imported directly (not passed as a prop) because component
+ * references can't cross the server→client boundary.
  */
-export default function Gallery({ images, alt, garmentKind, Garment }) {
+export default function Gallery({ images, alt, garmentKind }) {
   const [active, setActive] = useState(0);
   const hasImages = images && images.length > 0;
 
