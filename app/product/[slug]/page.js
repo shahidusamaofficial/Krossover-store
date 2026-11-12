@@ -19,11 +19,13 @@ export default async function Product({ params }) {
   return (
     <div className="pd">
             <div className="pd-media">
-                <div style={{ color: 'red', padding: 20, fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>
+                        <div style={{ color: 'red', padding: 20, fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>
           DEBUG video_url = {JSON.stringify(p.video_url)}<br/>
           DEBUG images = {JSON.stringify(p.images)}<br/>
           DEBUG image_url = {JSON.stringify(p.image_url)}<br/>
-          DEBUG all keys = {Object.keys(p).join(', ')}
+          DEBUG all keys = {Object.keys(p).join(', ')}<br/>
+          DEBUG SUPABASE_URL = {process.env.NEXT_PUBLIC_SUPABASE_URL || 'NOT SET'}<br/>
+          DEBUG ANON_KEY prefix = {(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'NOT SET').slice(0, 30)}<br/>
         </div>
         <Gallery images={images} alt={p.name} garmentKind={garmentKind} />
 
