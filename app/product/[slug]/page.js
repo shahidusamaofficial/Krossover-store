@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getProduct, rs } from '../../../lib/data';
 import Garment from '../../../components/Garment';
+import Gallery from './Gallery';
 import OrderForm from './OrderForm';
 
 export const dynamic = 'force-dynamic';
@@ -8,11 +9,26 @@ export const dynamic = 'force-dynamic';
 export default async function Product({ params }) {
   const p = await getProduct(params.slug);
   if (!p) notFound();
+
+  // Build the image list: prefer the new images[] array; fall back to legacy image_url.
+  const images = (p.images && p.images.length)
+    ? p.images
+    : (p.image_url ? [p.image_url] : []);
+
+  const garmentKind = p.slug && p.slug.includes('hoodie') ? 'hoodie' : 'tee';
+
   return (
     <div className="pd">
-      <div className="stage">
-        {p.image_url ? <img src={p.image_url} alt={p.name} /> : <Garment kind={p.slug.includes('hoodie') ? 'hoodie' : 'tee'} />}
+      <div className="pd-media">
+        <Gallery images={images} alt={p.name} garmentKind={garmentKind} Garment={Garment} />
+
+        {p.video_url && (
+          <div className="video">
+            <video src={p.video_url} controls playsinline preload="metadata" />
+          </div>
+        )}
       </div>
+
       <div className="panel glass">
         <h1 className="display">{p.name}</h1>
         <p style={{ fontSize: 22, margin: '0 0 8px' }}>{rs(p.price_pkr)}</p>
