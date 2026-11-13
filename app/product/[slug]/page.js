@@ -9,21 +9,6 @@ export default async function Product({ params }) {
   const p = await getProduct(params.slug);
   if (!p) notFound();
 
-  // DEBUG: raw fetch bypassing supabase-js
-  const testRes = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/products?select=*&slug=eq.sunday-tee`,
-    {
-      headers: {
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  const testJson = await testRes.json();
-  const testRow = testJson[0] || {};
-
-  // Build the image list: prefer the new images[] array; fall back to legacy image_url.
   const images = (p.images && p.images.length)
     ? p.images
     : (p.image_url ? [p.image_url] : []);
@@ -33,15 +18,6 @@ export default async function Product({ params }) {
   return (
     <div className="pd">
       <div className="pd-media">
-        <div style={{ color: 'red', padding: 20, fontFamily: 'monospace', fontSize: 11, wordBreak: 'break-all', background: '#fff' }}>
-          <strong>=== getProduct() result ===</strong><br/>
-          video_url = {JSON.stringify(p.video_url)}<br/>
-          all keys = {Object.keys(p).join(', ')}<br/><br/>
-          <strong>=== RAW fetch() result ===</strong><br/>
-          status = {testRes.status}<br/>
-          video_url = {JSON.stringify(testRow.video_url)}<br/>
-          all keys = {Object.keys(testRow).join(', ')}
-        </div>
         <Gallery images={images} alt={p.name} garmentKind={garmentKind} />
 
         {p.video_url && (
