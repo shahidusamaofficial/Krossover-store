@@ -22,7 +22,7 @@ export default async function Product({ params }) {
 
         {p.video_url && (
           <div className="video">
-            <video src={p.video_url} controls playsinline preload="metadata" />
+            <video src={p.video_url} autoPlay muted loop playsinline preload="auto" />
           </div>
         )}
       </div>
